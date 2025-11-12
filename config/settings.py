@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "phonenumber_field",
+    "cities_light",
     "users",
 ]
 
@@ -134,7 +136,7 @@ MESSAGE_TAGS = {
 
 # Users settings
 
-# AUTH_USER_MODEL = "users.CustomUser"
+AUTH_USER_MODEL = "users.CustomUser"
 # LOGIN_REDIRECT_URL = "reports:home"
 # LOGOUT_REDIRECT_URL = "reports:home"
 # LOGIN_URL = "users:login"
