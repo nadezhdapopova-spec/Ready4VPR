@@ -8,6 +8,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("users/", include("users.urls", namespace="users")),
+    path("lms/", include("lms.urls", namespace="lms")),
 ]
 
 
