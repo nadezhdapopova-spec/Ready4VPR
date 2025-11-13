@@ -3,7 +3,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env", override=True)
@@ -157,8 +156,4 @@ if CACHE_ENABLED:
 
 # Rest_framework settings
 
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
-    ]
-}
+REST_FRAMEWORK = {"DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"]}

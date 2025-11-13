@@ -19,8 +19,12 @@ class CustomUser(AbstractUser):
         region="RU", blank=True, null=True, verbose_name="Номер телефона", help_text="Необязательное поле"
     )
     avatar = models.ImageField(
-        upload_to="users/avatars/", blank=True, null=True, verbose_name="Аватар",
-        default="default/default.png", help_text="Необязательное поле"
+        upload_to="users/avatars/",
+        blank=True,
+        null=True,
+        verbose_name="Аватар",
+        default="default/default.png",
+        help_text="Необязательное поле",
     )
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Город")
 

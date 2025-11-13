@@ -13,13 +13,21 @@ class CustomUserAdmin(UserAdmin):
         ("Дополнительная информация", {"fields": ("phone_number", "city", "avatar", "avatar_tag")}),
     )
     add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": (
-                "email", "username", "password1", "password2",
-                "phone_number", "city", "avatar",
-            ),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "username",
+                    "password1",
+                    "password2",
+                    "phone_number",
+                    "city",
+                    "avatar",
+                ),
+            },
+        ),
     )
 
     readonly_fields = ("avatar_tag",)

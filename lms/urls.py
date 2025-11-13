@@ -1,9 +1,9 @@
 from django.urls import path
+
 from rest_framework.routers import DefaultRouter
 
 from lms.apps import LmsConfig
-from lms.views import CourseViewSet, LessonList, LessonRetrieve, LessonCreate, LessonUpdate, LessonDelete
-
+from lms.views import CourseViewSet, LessonCreate, LessonDelete, LessonList, LessonRetrieve, LessonUpdate
 
 app_name = LmsConfig.name
 
