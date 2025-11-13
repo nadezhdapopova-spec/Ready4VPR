@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "cities_light",
     "users",
+    "lms",
 ]
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
@@ -137,22 +138,6 @@ MESSAGE_TAGS = {
 # Users settings
 
 AUTH_USER_MODEL = "users.CustomUser"
-# LOGIN_REDIRECT_URL = "reports:home"
-# LOGOUT_REDIRECT_URL = "reports:home"
-# LOGIN_URL = "users:login"
-
-
-# Mail server settings
-
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# EMAIL_HOST = os.getenv("EMAIL_HOST")
-# EMAIL_PORT = os.getenv("EMAIL_PORT")
-# EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
-# EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
-# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # Caches settings
@@ -168,3 +153,12 @@ if CACHE_ENABLED:
 
 
 # Logging settings
+
+
+# Rest_framework settings
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+    ]
+}
