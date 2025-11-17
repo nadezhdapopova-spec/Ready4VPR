@@ -1,0 +1,29 @@
+[
+  {
+    "model": "lms.course",
+    "pk": 1,
+    "fields": {
+      "title": "ВПР Русский язык 1–4 класс",
+      "preview": "default/default.png",
+      "description": "Подготовка к ВПР по русскому языку для учеников 1–4 классов"
+    }
+  },
+  {
+    "model": "lms.course",
+    "pk": 2,
+    "fields": {
+      "title": "ВПР Математика 1–4 класс",
+      "preview": "default/default.png",
+      "description": "Подготовка к ВПР по математике для начальной школы"
+    }
+  },
+  {
+    "model": "lms.course",
+    "pk": 3,
+    "fields": {
+      "title": "ВПР Окружающий мир 1–4 класс",
+      "preview": "default/default.png",
+      "description": "Подготовка к ВПР по окружающему миру"
+    }
+  }
+]

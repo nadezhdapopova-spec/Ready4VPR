@@ -12,6 +12,7 @@ poetry-core = "^2.2.1"
 djangorestframework = "^3.16.1"
 python-dotenv = "^1.2.1"
 psycopg2-binary = "^2.9.11"
+django-filter = "^25.2"
 
 
 [tool.poetry.group.dev.dependencies]
