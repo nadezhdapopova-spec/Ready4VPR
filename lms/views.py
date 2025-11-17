@@ -1,4 +1,5 @@
 from rest_framework import generics, viewsets
+from rest_framework.filters import OrderingFilter
 
 from lms.models import Course, Lesson
 from lms.serializers import CourseSerializer, LessonSerializer
@@ -7,6 +8,8 @@ from lms.serializers import CourseSerializer, LessonSerializer
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    filter_backends = [OrderingFilter,]
+    ordering_fields = ["title",]
 
 
 class BaseLessonAPIView(generics.GenericAPIView):
@@ -15,7 +18,8 @@ class BaseLessonAPIView(generics.GenericAPIView):
 
 
 class LessonList(BaseLessonAPIView, generics.ListAPIView):
-    pass
+    filter_backends = [OrderingFilter, ]
+    ordering_fields = ["category", "title"]
 
 
 class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):
