@@ -6,19 +6,27 @@ from lms.serializers import CourseSerializer, LessonSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+    """Вьюсет курса"""
     serializer_class = CourseSerializer
-    queryset = Course.objects.all()
-    filter_backends = [OrderingFilter,]
-    ordering_fields = ["title",]
+    queryset = Course.objects.all().prefetch_related("lessons")
+    filter_backends = [
+        OrderingFilter,
+    ]
+    ordering_fields = [
+        "title",
+    ]
 
 
 class BaseLessonAPIView(generics.GenericAPIView):
-    queryset = Lesson.objects.all()
+    """Базовый вьюсет урока"""
+    queryset = Lesson.objects.all().select_related("category")
     serializer_class = LessonSerializer
 
 
 class LessonList(BaseLessonAPIView, generics.ListAPIView):
-    filter_backends = [OrderingFilter, ]
+    filter_backends = [
+        OrderingFilter,
+    ]
     ordering_fields = ["category", "title"]
 
 

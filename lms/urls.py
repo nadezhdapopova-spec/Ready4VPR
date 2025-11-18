@@ -4,7 +4,6 @@ from rest_framework.routers import DefaultRouter
 
 from lms.apps import LmsConfig
 from lms.views import CourseViewSet, LessonCreate, LessonDelete, LessonList, LessonRetrieve, LessonUpdate
-from users.views import PaymentListViewSet, PaymentRetrieveViewSet
 
 app_name = LmsConfig.name
 

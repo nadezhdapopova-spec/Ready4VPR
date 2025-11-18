@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, generics
+from rest_framework import generics, viewsets
 from rest_framework.filters import OrderingFilter
 
 from users.models import CustomUser, Payment

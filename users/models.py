@@ -9,6 +9,7 @@ from lms.models import Course, Lesson
 
 class City(models.Model):
     """Класс модели города"""
+
     name = models.CharField(max_length=100, unique=True, verbose_name="Город")
 
     def __str__(self):
@@ -57,10 +58,7 @@ class Payment(models.Model):
     ]
 
     user = models.ForeignKey(
-        to=CustomUser,
-        on_delete=models.CASCADE,
-        related_name="payments",
-        verbose_name="пользователь"
+        to=CustomUser, on_delete=models.CASCADE, related_name="payments", verbose_name="пользователь"
     )
     payment_amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Сумма платежа")
     paid_course = models.ForeignKey(
@@ -69,7 +67,7 @@ class Payment(models.Model):
         null=True,
         blank=True,
         related_name="course_payments",
-        verbose_name="Оплаченный курс"
+        verbose_name="Оплаченный курс",
     )
     paid_lesson = models.ForeignKey(
         to=Lesson,
@@ -77,7 +75,7 @@ class Payment(models.Model):
         null=True,
         blank=True,
         related_name="lesson_payments",
-        verbose_name="Оплаченный урок"
+        verbose_name="Оплаченный урок",
     )
     payment_method = models.CharField(max_length=8, choices=METHOD_CHOICES, verbose_name="Способ оплаты")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата платежа")
