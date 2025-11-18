@@ -20,6 +20,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_lessons_amount(instance):
+        """Возвращает количество уроков в курсе"""
         return instance.lessons.count()
 
     class Meta:

@@ -8,11 +8,12 @@ from lms.models import Course, Lesson
 
 
 class City(models.Model):
-    """Класс модели города"""
+    """Класс модели города (РФ)"""
 
     name = models.CharField(max_length=100, unique=True, verbose_name="Город")
 
     def __str__(self):
+        """Строковое отображение города"""
         return self.name
 
 
@@ -39,6 +40,7 @@ class CustomUser(AbstractUser):
     ]
 
     def __str__(self):
+        """Строковое отображение пользователя"""
         return self.username or self.email
 
     class Meta:
@@ -50,7 +52,7 @@ class CustomUser(AbstractUser):
 
 
 class Payment(models.Model):
-    """Модель платежа"""
+    """Класс модели платежа"""
 
     METHOD_CHOICES = [
         ("CASH", "Наличные"),
@@ -86,6 +88,7 @@ class Payment(models.Model):
             raise ValidationError("Платеж должен ссылаться либо на курс, либо на урок")
 
     def __str__(self):
+        """Строковое отображение платежа"""
         return f"Платеж от {self.user} на сумму {self.payment_amount}"
 
     class Meta:

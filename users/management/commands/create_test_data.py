@@ -6,7 +6,7 @@ from users.models import City, CustomUser, Payment
 
 
 class Command(BaseCommand):
-    help = "Add test users, courses, lessons, payments to the database from fixtures"
+    help = "Добавляет тестовые данные пользователя, курсов, уроков, платежей в БД из фикстур"
 
     def handle(self, *args, **kwargs):
         City.objects.all().delete()

@@ -16,6 +16,7 @@ class Course(models.Model):
     description = models.TextField(null=True, blank=True, verbose_name="Описание курса")
 
     def __str__(self):
+        """Строковое отображение курса"""
         return self.title
 
     class Meta:
@@ -28,6 +29,7 @@ class Course(models.Model):
 
 def get_default_course():
     """Устанавливает курс по умолчанию 'Вне курса'"""
+
     course, created = Course.objects.get_or_create(
         title="Вне курса", defaults={"description": "Дополнительно, вне курса"}
     )
@@ -57,6 +59,7 @@ class Lesson(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата последнего изменения")
 
     def __str__(self):
+        """Строковое отображение урока"""
         return self.title
 
     class Meta:

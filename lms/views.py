@@ -24,6 +24,7 @@ class BaseLessonAPIView(generics.GenericAPIView):
 
 
 class LessonList(BaseLessonAPIView, generics.ListAPIView):
+    """Вьюсет списка уроков"""
     filter_backends = [
         OrderingFilter,
     ]
@@ -31,16 +32,20 @@ class LessonList(BaseLessonAPIView, generics.ListAPIView):
 
 
 class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):
+    """Вьюсет урока"""
     pass
 
 
 class LessonCreate(BaseLessonAPIView, generics.CreateAPIView):
+    """Вьюсет создания урока"""
     pass
 
 
 class LessonUpdate(BaseLessonAPIView, generics.UpdateAPIView):
+    """Вьюсет редактирования урока"""
     pass
 
 
 class LessonDelete(BaseLessonAPIView, generics.DestroyAPIView):
+    """Вьюсет удаления урока"""
     pass

@@ -7,6 +7,7 @@ from users.models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
+    """Класс для настройки панели админа (суперпользователя)"""
     model = CustomUser
     list_display = ("email", "username", "city", "avatar_preview", "is_staff")
     fieldsets = UserAdmin.fieldsets + (
@@ -41,6 +42,7 @@ class CustomUserAdmin(UserAdmin):
 
     @admin.display(description="Текущий аватар")
     def avatar_tag(self, obj):
+        """Отображает текущий аватар пользователя"""
         if obj.avatar:
             return format_html('<img src="{}" width="100" style="border-radius:10px;" />', obj.avatar.url)
         return "—"
