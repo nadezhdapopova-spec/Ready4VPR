@@ -8,7 +8,9 @@ from users.serializers import CustomUserSerializer, PaymentSerializer
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.all().prefetch_related("payments")
+    filter_backends = [OrderingFilter]
+    ordering_fields = ("id",)
 
 
 class PaymentListViewSet(generics.ListAPIView):

@@ -17,8 +17,6 @@ urlpatterns = [
     path("lessons/create/", LessonCreate.as_view(), name="lesson_create"),
     path("lessons/<int:pk>/update/", LessonUpdate.as_view(), name="lesson_update"),
     path("lessons/<int:pk>/delete/", LessonDelete.as_view(), name="lesson_delete"),
-    path("payment/", PaymentListViewSet.as_view(), name="payment_list"),
-    path("payment/<int:pk>/", PaymentRetrieveViewSet.as_view(), name="payment_detail"),
 ]
 
 urlpatterns += router.urls
