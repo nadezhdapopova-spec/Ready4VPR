@@ -1,0 +1,121 @@
+[
+  {
+    "model": "lms.lesson",
+    "pk": 1,
+    "fields": {
+      "title": "Русский язык: Части речи",
+      "description": "Основные части речи для подготовки к ВПР",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 1,
+      "created_at": "2024-01-01T12:00:00Z",
+      "updated_at": "2024-01-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 2,
+    "fields": {
+      "title": "Русский язык: Правописание",
+      "description": "Орфография и пунктуация",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 1,
+      "created_at": "2024-01-01T12:05:00Z",
+      "updated_at": "2024-01-01T12:05:00Z"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 3,
+    "fields": {
+      "title": "Русский язык: Текст",
+      "description": "Работа с текстом и развитие речи",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 1,
+      "created_at": "2024-01-01T12:10:00Z",
+      "updated_at": "2024-01-01T12:10:00Z"
+    }
+  },
+
+  {
+    "model": "lms.lesson",
+    "pk": 4,
+    "fields": {
+      "title": "Математика: Арифметика",
+      "description": "Сложение, вычитание, умножение, деление",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 2,
+      "created_at": "2024-01-02T12:00:00Z",
+      "updated_at": "2024-01-02T12:00:00Z"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 5,
+    "fields": {
+      "title": "Математика: Геометрия",
+      "description": "Фигуры, периметр и площадь",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 2,
+      "created_at": "2024-01-02T12:05:00Z",
+      "updated_at": "2024-01-02T12:05:00Z"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 6,
+    "fields": {
+      "title": "Математика: Логические задачи",
+      "description": "Развитие логического мышления",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 2,
+      "created_at": "2024-01-02T12:10:00Z",
+      "updated_at": "2024-01-02T12:10:00Z"
+    }
+  },
+
+  {
+    "model": "lms.lesson",
+    "pk": 7,
+    "fields": {
+      "title": "Окружающий мир: Природа",
+      "description": "Растения, животные, природные ресурсы",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 3,
+      "created_at": "2024-01-03T12:00:00Z",
+      "updated_at": "2024-01-03T12:00:00Z"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 8,
+    "fields": {
+      "title": "Окружающий мир: Человек",
+      "description": "Строение человека и здоровье",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 3,
+      "created_at": "2024-01-03T12:05:00Z",
+      "updated_at": "2024-01-03T12:05:00Z"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 9,
+    "fields": {
+      "title": "Окружающий мир: Общество",
+      "description": "Социальные группы, профессии",
+      "preview": "default/default.png",
+      "video_link": "",
+      "category": 3,
+      "created_at": "2024-01-03T12:10:00Z",
+      "updated_at": "2024-01-03T12:10:00Z"
+    }
+  }
+]

@@ -1,9 +1,26 @@
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, viewsets
+from rest_framework.filters import OrderingFilter
 
-from users.models import CustomUser
-from users.serializers import CustomUserSerializer
+from users.models import CustomUser, Payment
+from users.serializers import CustomUserSerializer, PaymentSerializer
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.all().prefetch_related("payments")
+    filter_backends = [OrderingFilter]
+    ordering_fields = ("id",)
+
+
+class PaymentListViewSet(generics.ListAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ("paid_course", "paid_lesson", "payment_method")
+    ordering_fields = ("created_at",)
+
+
+class PaymentRetrieveViewSet(generics.RetrieveAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
