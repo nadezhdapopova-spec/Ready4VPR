@@ -9,6 +9,7 @@ from users.permissions import IsModerator, IsOwner
 
 class CourseViewSet(viewsets.ModelViewSet):
     """Вьюсет курса"""
+
     serializer_class = CourseSerializer
     queryset = Course.objects.all().prefetch_related("lessons")
     filter_backends = [
@@ -20,7 +21,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """При создании курса устанавливает пользователя как владельца"""
-        serializer.save(owner = self.request.user)
+        serializer.save(owner=self.request.user)
 
     def get_permissions(self):
         """Определяет права на действия с курсами для разных уровней пользователей:
@@ -37,17 +38,19 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated, ~IsModerator]
         elif self.action == "destroy":
             self.permission_classes = [IsAuthenticated, IsOwner]
-        return  [perm() for perm in self.permission_classes]
+        return [perm() for perm in self.permission_classes]
 
 
 class BaseLessonAPIView(generics.GenericAPIView):
     """Базовый вьюсет урока"""
+
     queryset = Lesson.objects.all().select_related("category")
     serializer_class = LessonSerializer
 
 
 class LessonList(BaseLessonAPIView, generics.ListAPIView):
     """Вьюсет списка уроков"""
+
     filter_backends = [
         OrderingFilter,
     ]
@@ -57,23 +60,27 @@ class LessonList(BaseLessonAPIView, generics.ListAPIView):
 
 class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):
     """Вьюсет урока"""
+
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
 
 
 class LessonCreate(BaseLessonAPIView, generics.CreateAPIView):
     """Вьюсет создания урока"""
+
     permission_classes = [IsAuthenticated, ~IsModerator]
 
     def perform_create(self, serializer):
         """При создании урока устанавливает пользователя как владельца"""
-        serializer.save(owner = self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class LessonUpdate(BaseLessonAPIView, generics.UpdateAPIView):
     """Вьюсет редактирования урока"""
+
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
 
 
 class LessonDelete(BaseLessonAPIView, generics.DestroyAPIView):
     """Вьюсет удаления урока"""
+
     permission_classes = [IsAuthenticated, IsOwner]

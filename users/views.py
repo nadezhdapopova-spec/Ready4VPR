@@ -6,19 +6,23 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from users.models import CustomUser, Payment
 from users.permissions import IsProfileOwner
-from users.serializers import CustomUserSerializer, PaymentSerializer, RegisterSerializer, PublicUserSerializer
+from users.serializers import CustomUserSerializer, PaymentSerializer, PublicUserSerializer, RegisterSerializer
 
 
 class RegisterAPIView(CreateAPIView):
     """Представление для регистрации пользователя"""
+
     serializer_class = RegisterSerializer
     queryset = CustomUser.objects.all()
-    permission_classes = [AllowAny,]
+    permission_classes = [
+        AllowAny,
+    ]
     authentication_classes = []
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     """Представление для модели пользователя"""
+
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all().prefetch_related("payments")
     filter_backends = [OrderingFilter]
@@ -57,6 +61,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
 class PaymentListViewSet(generics.ListAPIView):
     """Представление для просмотра платежей"""
+
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -66,5 +71,6 @@ class PaymentListViewSet(generics.ListAPIView):
 
 class PaymentRetrieveViewSet(generics.RetrieveAPIView):
     """Представление для просмотра деталей платежа"""
+
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()

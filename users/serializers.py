@@ -5,6 +5,7 @@ from users.models import CustomUser, Payment
 
 class PaymentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели платежей"""
+
     paid_course = serializers.StringRelatedField()
     paid_lesson = serializers.StringRelatedField()
 
@@ -15,6 +16,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class PublicUserSerializer(serializers.ModelSerializer):
     """Сериализатор для публичного профиля пользователя"""
+
     class Meta:
         model = CustomUser
         fields = ("id", "username", "email", "avatar", "city")
@@ -22,6 +24,7 @@ class PublicUserSerializer(serializers.ModelSerializer):
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для полного профиля пользователя"""
+
     payments = PaymentSerializer(many=True, read_only=True)
 
     class Meta:
@@ -31,6 +34,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователя"""
+
     password = serializers.CharField(write_only=True)
 
     class Meta:
