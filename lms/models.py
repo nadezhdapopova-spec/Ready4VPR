@@ -14,6 +14,9 @@ class Course(models.Model):
         help_text="Необязательное поле",
     )
     description = models.TextField(null=True, blank=True, verbose_name="Описание курса")
+    owner = models.ForeignKey(
+        to="users.CustomUser", on_delete=models.SET_NULL, related_name="users", null=True
+    )
 
     def __str__(self):
         """Строковое отображение курса"""

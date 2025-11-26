@@ -16,6 +16,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         "title",
     ]
 
+    def perform_create(self, serializer):
+        serializer.save(owner = self.request.user)
+
 
 class BaseLessonAPIView(generics.GenericAPIView):
     """Базовый вьюсет урока"""
@@ -39,9 +42,7 @@ class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):
 class LessonCreate(BaseLessonAPIView, generics.CreateAPIView):
     """Вьюсет создания урока"""
     def perform_create(self, serializer):
-        lesson = serializer.save()
-        lesson.owner = self.request.user
-        lesson.save()
+        serializer.save(owner = self.request.user)
 
 
 class LessonUpdate(BaseLessonAPIView, generics.UpdateAPIView):
