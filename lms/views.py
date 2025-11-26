@@ -38,7 +38,10 @@ class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):
 
 class LessonCreate(BaseLessonAPIView, generics.CreateAPIView):
     """Вьюсет создания урока"""
-    pass
+    def perform_create(self, serializer):
+        lesson = serializer.save()
+        lesson.owner = self.request.user
+        lesson.save()
 
 
 class LessonUpdate(BaseLessonAPIView, generics.UpdateAPIView):
