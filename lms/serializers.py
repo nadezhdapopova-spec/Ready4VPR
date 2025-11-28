@@ -24,7 +24,7 @@ class CourseSerializer(serializers.ModelSerializer):
     """Сериализатор курса"""
 
     lessons_amount = serializers.SerializerMethodField()
-    lessons = LessonSerializer(many=True)
+    lessons = LessonSerializer(many=True, read_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
     @staticmethod
@@ -36,7 +36,7 @@ class CourseSerializer(serializers.ModelSerializer):
         """Возвращает булевое значение для поля подписки пользователем на курс"""
         user = self.context.get("request").user
         if user.is_authenticated:
-            return CourseSubscription.objects.filter(user=user, course=obj, is_active=True).exists()
+            return CourseSubscription.objects.filter(user=user, course=obj).exists()
         return False
 
     class Meta:

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lms.models import Course, Lesson, CourseSubscription
+from lms.paginators import CoursePaginator, LessonPaginator
 from lms.serializers import CourseSerializer, LessonSerializer
 from users.permissions import IsModerator, IsOwner
 
@@ -21,6 +22,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     ordering_fields = [
         "title",
     ]
+    pagination_class = CoursePaginator
 
     def perform_create(self, serializer):
         """При создании курса устанавливает пользователя как владельца"""
@@ -62,6 +64,7 @@ class LessonList(BaseLessonAPIView, generics.ListAPIView):
     ]
     ordering_fields = ["category", "title"]
     permission_classes = [IsAuthenticated]
+    pagination_class = LessonPaginator
 
 
 class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):

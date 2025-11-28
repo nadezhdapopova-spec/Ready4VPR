@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
 
@@ -18,6 +18,7 @@ urlpatterns = [
     path("lessons/<int:pk>/update/", LessonUpdate.as_view(), name="lesson_update"),
     path("lessons/<int:pk>/delete/", LessonDelete.as_view(), name="lesson_delete"),
     path("subscription/", CourseSubscriptionAPIView.as_view(), name="subscription"),
+    path("", include(router.urls)),
 ]
 
-urlpatterns += router.urls
+# urlpatterns += router.urls
