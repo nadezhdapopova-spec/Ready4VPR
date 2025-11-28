@@ -5,11 +5,13 @@ from lms.models import Course, Lesson
 
 class LessonSerializer(serializers.ModelSerializer):
     """Сериализатор урока"""
+
     category = serializers.StringRelatedField()
+    category_id = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all(), source="category", write_only=True)
 
     class Meta:
         model = Lesson
-        fields = ("id", "title", "preview", "description", "video_link", "category")
+        fields = ("id", "title", "preview", "description", "video_link", "category", "category_id", "owner")
 
 
 class CourseSerializer(serializers.ModelSerializer):

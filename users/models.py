@@ -4,8 +4,6 @@ from django.db import models
 
 from phonenumber_field.modelfields import PhoneNumberField
 
-from lms.models import Course, Lesson
-
 
 class City(models.Model):
     """Класс модели города (РФ)"""
@@ -64,7 +62,7 @@ class Payment(models.Model):
     )
     payment_amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Сумма платежа")
     paid_course = models.ForeignKey(
-        to=Course,
+        to="lms.Course",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -72,7 +70,7 @@ class Payment(models.Model):
         verbose_name="Оплаченный курс",
     )
     paid_lesson = models.ForeignKey(
-        to=Lesson,
+        to="lms.Lesson",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

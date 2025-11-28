@@ -14,6 +14,7 @@ class Course(models.Model):
         help_text="Необязательное поле",
     )
     description = models.TextField(null=True, blank=True, verbose_name="Описание курса")
+    owner = models.ForeignKey(to="users.CustomUser", on_delete=models.SET_NULL, related_name="users", null=True)
 
     def __str__(self):
         """Строковое отображение курса"""
@@ -55,6 +56,7 @@ class Lesson(models.Model):
     category = models.ForeignKey(
         to=Course, on_delete=models.CASCADE, related_name="lessons", default=get_default_course
     )
+    owner = models.ForeignKey(to="users.CustomUser", on_delete=models.SET_NULL, related_name="user", null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата последнего изменения")
 

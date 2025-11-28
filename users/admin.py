@@ -8,8 +8,9 @@ from users.models import CustomUser
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс для настройки панели админа (суперпользователя)"""
+
     model = CustomUser
-    list_display = ("email", "username", "city", "avatar_preview", "is_staff")
+    list_display = ("email", "username", "city", "avatar_preview", "is_active", "is_staff", "is_superuser")
     fieldsets = UserAdmin.fieldsets + (
         ("Дополнительная информация", {"fields": ("phone_number", "city", "avatar", "avatar_tag")}),
     )
