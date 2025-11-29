@@ -1,11 +1,11 @@
 from rest_framework import generics, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lms.models import Course, Lesson, CourseSubscription
+from lms.models import Course, CourseSubscription, Lesson
 from lms.paginators import CoursePaginator, LessonPaginator
 from lms.serializers import CourseSerializer, LessonSerializer
 from users.permissions import IsModerator, IsOwner, NotModerator
@@ -97,6 +97,7 @@ class LessonDelete(BaseLessonAPIView, generics.DestroyAPIView):
 
 class CourseSubscriptionAPIView(APIView):
     """Вьюсет подписки пользователя на курс"""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

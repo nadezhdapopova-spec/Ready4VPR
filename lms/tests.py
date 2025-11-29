@@ -1,25 +1,24 @@
 from django.contrib.auth.models import Group
 from django.urls import reverse
+
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
+
+from lms.models import Course, CourseSubscription, Lesson
 from users.models import CustomUser
-from lms.models import Course, Lesson, CourseSubscription
 
 
 class TestBaseLMSViewSet(APITestCase):
     """Базовый клас для тестирования корректности работы CRUD приложения lms"""
+
     def setUp(self):
         """Формирует тестовые данные"""
         super().setUp()
         self.superuser = CustomUser.objects.create_superuser(
             email="admin@test.com", username="admin", password="admin123"
         )
-        self.user = CustomUser.objects.create_user(
-            email="user@test.com", username="user", password="user123"
-        )
-        self.moderator = CustomUser.objects.create_user(
-            email="mod@test.com", username="mod", password="mod123"
-        )
+        self.user = CustomUser.objects.create_user(email="user@test.com", username="user", password="user123")
+        self.moderator = CustomUser.objects.create_user(email="mod@test.com", username="mod", password="mod123")
         group = Group.objects.create(name="moderators")
         self.moderator.groups.add(group)
 
@@ -212,7 +211,11 @@ class TestLessonViewSet(TestBaseLMSViewSet):
         """Проверяет, что авторизованный пользователь может создавать урок с корректной ссылкой"""
         url = reverse("lms:lesson_create")
         course_id = self.course.id
-        data = {"title": "User Lesson", "category": course_id, "video_link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+        data = {
+            "title": "User Lesson",
+            "category": course_id,
+            "video_link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        }
         response = self.client_user.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Lesson.objects.filter(title="User Lesson").exists())
@@ -280,17 +283,11 @@ class TestCourseSubscriptionAPIView(APITestCase):
     """Тесты для подписки и отписки от курса"""
 
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            username="testuser",
-            email="user@test.com",
-            password="testpass123")
+        self.user = CustomUser.objects.create_user(username="testuser", email="user@test.com", password="testpass123")
         self.client_user = APIClient()
         self.client_user.force_authenticate(self.user)
 
-        self.course = Course.objects.create(
-            title="Test Course",
-            owner=self.user
-        )
+        self.course = Course.objects.create(title="Test Course", owner=self.user)
 
         self.url = reverse("lms:subscription")
 
@@ -312,11 +309,7 @@ class TestCourseSubscriptionAPIView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "Подписка добавлена")
 
-        self.assertTrue(
-            CourseSubscription.objects.filter(
-                user=self.user, course=self.course
-            ).exists()
-        )
+        self.assertTrue(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
 
     def test_subscription_remove(self):
         """Проверяет, что когда подписка существует — она удаляется"""
@@ -326,24 +319,16 @@ class TestCourseSubscriptionAPIView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "Подписка удалена")
 
-        self.assertFalse(
-            CourseSubscription.objects.filter(
-                user=self.user, course=self.course
-            ).exists()
-        )
+        self.assertFalse(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
 
     def test_subscription_toggle_behaviour(self):
         """Проверяет, что можно сначала добавить подписку, потом удалить"""
         first_add = self.client_user.post(self.url, {"course_id": self.course.id})
         self.assertEqual(first_add.data["message"], "Подписка добавлена")
 
-        self.assertTrue(
-            CourseSubscription.objects.filter(user=self.user, course=self.course).exists()
-        )
+        self.assertTrue(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
 
         second_del = self.client_user.post(self.url, {"course_id": self.course.id})
         self.assertEqual(second_del.data["message"], "Подписка удалена")
 
-        self.assertFalse(
-            CourseSubscription.objects.filter(user=self.user, course=self.course).exists()
-        )
+        self.assertFalse(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())

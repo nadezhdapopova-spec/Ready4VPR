@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from lms.models import Course, Lesson, CourseSubscription
+from lms.models import Course, CourseSubscription, Lesson
 from lms.validators import VideoLinkValidator
 
 
@@ -9,15 +9,12 @@ class LessonSerializer(serializers.ModelSerializer):
 
     category = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
     video_link = serializers.URLField(
-        required=False,
-        allow_blank=True,
-        validators=[VideoLinkValidator(field="video_link")]
+        required=False, allow_blank=True, validators=[VideoLinkValidator(field="video_link")]
     )
 
     class Meta:
         model = Lesson
         fields = ("id", "title", "preview", "description", "video_link", "category", "owner")
-
 
 
 class CourseSerializer(serializers.ModelSerializer):
