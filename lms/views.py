@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from lms.models import Course, Lesson, CourseSubscription
 from lms.paginators import CoursePaginator, LessonPaginator
 from lms.serializers import CourseSerializer, LessonSerializer
-from users.permissions import IsModerator, IsOwner
+from users.permissions import IsModerator, IsOwner, NotModerator
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -76,7 +76,7 @@ class LessonRetrieve(BaseLessonAPIView, generics.RetrieveAPIView):
 class LessonCreate(BaseLessonAPIView, generics.CreateAPIView):
     """Вьюсет создания урока"""
 
-    permission_classes = [IsAuthenticated, ~IsModerator]
+    permission_classes = [IsAuthenticated, NotModerator]
 
     def perform_create(self, serializer):
         """При создании урока устанавливает пользователя как владельца"""
