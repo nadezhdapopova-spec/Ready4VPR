@@ -70,3 +70,27 @@ class Lesson(models.Model):
         ordering = [
             "title",
         ]
+
+
+class CourseSubscription(models.Model):
+    """Модель подписки пользователя на обновления курса"""
+
+    user = models.ForeignKey(
+        to="users.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="subscribers",
+    )
+    course = models.ForeignKey(
+        to=Course,
+        on_delete=models.CASCADE,
+        related_name="course_subscriptions",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "course")
+        verbose_name = "подписка на курс"
+        verbose_name_plural = "подписки на курсы"
+
+    def __str__(self):
+        return f"{self.user} - {self.course}"
