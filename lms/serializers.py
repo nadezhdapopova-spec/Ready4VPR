@@ -39,3 +39,13 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ("id", "title", "preview", "description", "lessons_amount", "lessons", "is_subscribed")
+
+
+class CourseSubscriptionInputSerializer(serializers.Serializer):
+    course_id = serializers.IntegerField()
+
+
+class CourseSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseSubscription
+        fields = "__all__"

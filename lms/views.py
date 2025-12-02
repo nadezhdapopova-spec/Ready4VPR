@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
@@ -7,7 +8,8 @@ from rest_framework.views import APIView
 
 from lms.models import Course, CourseSubscription, Lesson
 from lms.paginators import CoursePaginator, LessonPaginator
-from lms.serializers import CourseSerializer, LessonSerializer
+from lms.serializers import CourseSerializer, LessonSerializer, CourseSubscriptionInputSerializer, \
+    CourseSubscriptionSerializer
 from users.permissions import IsModerator, IsOwner, NotModerator
 
 
@@ -100,24 +102,32 @@ class CourseSubscriptionAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=CourseSubscriptionInputSerializer,
+        responses={
+            200: CourseSubscriptionSerializer,
+            400: "Ошибка запроса",
+            404: "Курс не найден",
+        },
+    )
     def post(self, request):
         """
         Если подписки на курс нет - добавляет подписку,
         если подписка на курс есть - удаляет подписку
         """
+        input_serializer = CourseSubscriptionInputSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+
         user = request.user
-        course_id = request.data.get("course_id")
-        if not course_id:
-            return Response({"error": "Не указан course_id"}, status=400)
+        course_id = input_serializer.validated_data["course_id"]
 
         course = get_object_or_404(Course, id=course_id)
         subs = CourseSubscription.objects.filter(user=user, course=course).first()
 
         if subs:
             subs.delete()
-            message = "Подписка удалена"
-        else:
-            CourseSubscription.objects.create(user=user, course=course)
-            message = "Подписка добавлена"
+            return Response({"message": "Подписка удалена"}, status=200)
+        CourseSubscription.objects.create(user=user, course=course)
+        output_serializer = CourseSubscriptionSerializer(subs)
 
-        return Response({"message": message})
+        return Response(output_serializer.data, status=200)
