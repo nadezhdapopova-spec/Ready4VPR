@@ -192,5 +192,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
 ]
 
+# API STRIPE
+
 STRIPE_API_URL = "https://api.stripe.com"
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")

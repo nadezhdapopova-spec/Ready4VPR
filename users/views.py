@@ -1,12 +1,16 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
+from lms.models import Course, Lesson
 from users.models import CustomUser, Payment
-from users.permissions import IsProfileOwner
-from users.serializers import CustomUserSerializer, PaymentSerializer, PublicUserSerializer, RegisterSerializer
+from users.permissions import IsProfileOwner, IsOwner, IsModerator
+from users.serializers import CustomUserSerializer, PaymentSerializer, PublicUserSerializer, RegisterSerializer, \
+    PaymentCreateSerializer
+from users.services import create_stripe_product, create_stripe_price, create_checkout_session
 
 
 class RegisterAPIView(CreateAPIView):
@@ -27,7 +31,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all().prefetch_related("payments")
     filter_backends = [OrderingFilter]
     ordering_fields = ("id",)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,]
 
     def get_serializer_class(self):
         """
@@ -67,6 +71,9 @@ class PaymentListViewSet(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ("paid_course", "paid_lesson", "payment_method")
     ordering_fields = ("created_at",)
+    permission_classes = [
+        IsOwner, IsModerator
+    ]
 
 
 class PaymentRetrieveViewSet(generics.RetrieveAPIView):
@@ -74,3 +81,61 @@ class PaymentRetrieveViewSet(generics.RetrieveAPIView):
 
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
+    permission_classes = [
+        IsOwner, IsModerator
+    ]
+
+
+class PaymentCreateViewSet(generics.CreateAPIView):
+    """Представление для создания платежа через API STRIPE"""
+
+    serializer_class = PaymentCreateSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def perform_create(self, serializer):
+        """Создает платеж, возвращает данные платежа с ссылкой для оплаты"""
+        user = self.request.user
+        course_id = serializer.validated_data.get("course_id")
+        lesson_id = serializer.validated_data.get("lesson_id")
+
+        if course_id:
+            course = get_object_or_404(Course, id=course_id)
+            amount = course.price
+            payment = Payment.objects.create(
+                user=user, paid_course=course, payment_amount=amount
+            )
+            product_name = f"Оплата курса: {course.title}"
+        else:
+            lesson = get_object_or_404(Lesson, id=lesson_id)
+            amount = lesson.price
+            payment = Payment.objects.create(
+                user=user, paid_lesson=lesson, payment_amount=amount
+            )
+            product_name = f"Оплата урока: {lesson.title}"
+
+        product_id = create_stripe_product(product_name)
+        payment.stripe_product_id = product_id
+
+        price_id = create_stripe_price(product_id, int(amount * 100))
+        payment.stripe_price_id = price_id
+
+        session_id, payment_url = create_checkout_session(price_id, payment.id)
+        payment.stripe_session_id = session_id
+        payment.stripe_payment_url = payment_url
+
+        payment.save()
+
+        self.response_data = {
+            "payment_id": payment.id,
+            "checkout_url": payment_url,
+            "payment_amount": payment.payment_amount
+        }
+
+    def create(self, request, *args, **kwargs):
+        """Переопределяет базовый метод create, чтобы вернуть кастомный Response"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(self.response_data, status=201)

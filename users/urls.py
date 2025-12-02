@@ -5,7 +5,8 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from users.apps import UsersConfig
-from users.views import CustomUserViewSet, PaymentListViewSet, PaymentRetrieveViewSet, RegisterAPIView
+from users.views import CustomUserViewSet, PaymentListViewSet, PaymentRetrieveViewSet, RegisterAPIView, \
+    PaymentCreateViewSet
 
 app_name = UsersConfig.name
 
@@ -16,6 +17,7 @@ urlpatterns = [
     path("register/", RegisterAPIView.as_view(), name="user_register"),
     path("payment/", PaymentListViewSet.as_view(), name="payment_list"),
     path("payment/<int:pk>/", PaymentRetrieveViewSet.as_view(), name="payment_detail"),
+    path("payment/create/", PaymentCreateViewSet.as_view(), name="payment_create"),
     path(
         "token/",
         TokenObtainPairView.as_view(

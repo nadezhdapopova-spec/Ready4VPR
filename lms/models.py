@@ -15,6 +15,7 @@ class Course(models.Model):
     )
     description = models.TextField(null=True, blank=True, verbose_name="Описание курса")
     owner = models.ForeignKey(to="users.CustomUser", on_delete=models.SET_NULL, related_name="users", null=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=1000, verbose_name="Цена курса")
 
     def __str__(self):
         """Строковое отображение курса"""
@@ -57,6 +58,7 @@ class Lesson(models.Model):
         to=Course, on_delete=models.CASCADE, related_name="lessons", default=get_default_course
     )
     owner = models.ForeignKey(to="users.CustomUser", on_delete=models.SET_NULL, related_name="user", null=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=500, verbose_name="Цена урока")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата последнего изменения")
 
