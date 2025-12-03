@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from lms.models import Course, Lesson
 from users.models import CustomUser, Payment
-from users.permissions import IsProfileOwner, IsOwner, IsModerator
+from users.permissions import IsModerator, IsOwner, IsProfileOwner
 from users.serializers import (
     CustomUserSerializer,
     PaymentCreateSerializer,
@@ -183,10 +183,12 @@ class PaymentStatusAPIView(APIView):
 
         session = get_session_status(payment.stripe_session_id)
 
-        return Response({
-            "payment_id": payment.id,
-            "status": session["payment_status"],
-            "session_status": session["status"],
-            "amount_total": session["amount_total"] / 100,
-            "currency": session["currency"],
-        })
+        return Response(
+            {
+                "payment_id": payment.id,
+                "status": session["payment_status"],
+                "session_status": session["status"],
+                "amount_total": session["amount_total"] / 100,
+                "currency": session["currency"],
+            }
+        )

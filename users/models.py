@@ -84,7 +84,6 @@ class Payment(models.Model):
     payment_method = models.CharField(
         max_length=8, choices=METHOD_CHOICES, verbose_name="Способ оплаты", default="STRIPE"
     )
-    status = models.CharField(max_length=50, default="unpaid")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата платежа")
 
     stripe_product_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="ID товара")
