@@ -5,10 +5,11 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.generics import CreateAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from lms.models import Course, Lesson
 from users.models import CustomUser, Payment
-from users.permissions import IsProfileOwner
+from users.permissions import IsProfileOwner, IsOwner, IsModerator
 from users.serializers import (
     CustomUserSerializer,
     PaymentCreateSerializer,
@@ -16,7 +17,7 @@ from users.serializers import (
     PublicUserSerializer,
     RegisterSerializer,
 )
-from users.services import create_checkout_session, create_stripe_price, create_stripe_product
+from users.services import create_checkout_session, create_stripe_price, create_stripe_product, get_session_status
 
 
 class RegisterAPIView(CreateAPIView):
@@ -169,3 +170,23 @@ class PaymentCreateViewSet(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(self.response_data, status=201)
+
+
+class PaymentStatusAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwner | IsModerator]
+
+    def get(self, request, payment_id):
+        payment = get_object_or_404(Payment, id=payment_id)
+
+        if not payment.stripe_session_id:
+            return Response({"error": "Для этого платежа нет сессии Stripe"}, status=400)
+
+        session = get_session_status(payment.stripe_session_id)
+
+        return Response({
+            "payment_id": payment.id,
+            "status": session["payment_status"],
+            "session_status": session["status"],
+            "amount_total": session["amount_total"] / 100,
+            "currency": session["currency"],
+        })

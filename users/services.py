@@ -40,4 +40,4 @@ def create_checkout_session(price_id: str, payment_id: int):
 def get_session_status(session_id: str):
     """Возвращает статус сессии в stripe"""
     session = stripe.checkout.Session.retrieve(session_id)
-    return session.get("payment_status")
+    return session
