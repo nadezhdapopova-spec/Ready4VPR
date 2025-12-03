@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import CreateAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -71,9 +72,18 @@ class PaymentListViewSet(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ("paid_course", "paid_lesson", "payment_method")
     ordering_fields = ("created_at",)
-    permission_classes = [
-        IsOwner, IsModerator
-    ]
+    permission_classes = [IsAuthenticated,]
+
+    def get_queryset(self):
+        """
+        Все платежи может просматривать админ и модератор,
+        авторизованный пользователь видит свои платежи
+        """
+
+        user = self.request.user
+        if user.is_superuser or user.groups.filter(name="moderators").exists():
+            return Payment.objects.all()
+        return Payment.objects.filter(user=user)
 
 
 class PaymentRetrieveViewSet(generics.RetrieveAPIView):
@@ -81,18 +91,23 @@ class PaymentRetrieveViewSet(generics.RetrieveAPIView):
 
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
-    permission_classes = [
-        IsOwner, IsModerator
-    ]
+    permission_classes = [IsAuthenticated,]
+
+    def get_object(self):
+        obj = super().get_object()
+        user = self.request.user
+        if user.is_superuser or user.groups.filter(name="moderators").exists():
+            return obj
+        if obj.user != user:
+            raise PermissionDenied("Вы не можете просматривать чужой платеж")
+        return obj
 
 
 class PaymentCreateViewSet(generics.CreateAPIView):
     """Представление для создания платежа через API STRIPE"""
 
     serializer_class = PaymentCreateSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
+    permission_classes = [IsAuthenticated,]
 
     def perform_create(self, serializer):
         """Создает платеж, возвращает данные платежа с ссылкой для оплаты"""
