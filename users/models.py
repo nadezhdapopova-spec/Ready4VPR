@@ -62,7 +62,7 @@ class Payment(models.Model):
         null=True,
         blank=True,
         related_name="payments",
-        verbose_name="Пользователь"
+        verbose_name="Пользователь",
     )
     payment_amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Сумма платежа")
     paid_course = models.ForeignKey(
@@ -81,10 +81,9 @@ class Payment(models.Model):
         related_name="lesson_payments",
         verbose_name="Оплаченный урок",
     )
-    payment_method = models.CharField(max_length=8,
-                                      choices=METHOD_CHOICES,
-                                      verbose_name="Способ оплаты",
-                                      default="STRIPE")
+    payment_method = models.CharField(
+        max_length=8, choices=METHOD_CHOICES, verbose_name="Способ оплаты", default="STRIPE"
+    )
     status = models.CharField(max_length=50, default="unpaid")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата платежа")
 

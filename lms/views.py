@@ -8,8 +8,12 @@ from rest_framework.views import APIView
 
 from lms.models import Course, CourseSubscription, Lesson
 from lms.paginators import CoursePaginator, LessonPaginator
-from lms.serializers import CourseSerializer, LessonSerializer, CourseSubscriptionInputSerializer, \
-    CourseSubscriptionSerializer
+from lms.serializers import (
+    CourseSerializer,
+    CourseSubscriptionInputSerializer,
+    CourseSubscriptionSerializer,
+    LessonSerializer,
+)
 from users.permissions import IsModerator, IsOwner, NotModerator
 
 

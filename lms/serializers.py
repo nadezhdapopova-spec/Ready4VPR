@@ -42,10 +42,14 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class CourseSubscriptionInputSerializer(serializers.Serializer):
+    """Сериализатор подписки для post запросов"""
+
     course_id = serializers.IntegerField()
 
 
 class CourseSubscriptionSerializer(serializers.ModelSerializer):
+    """Сериализатор подписки для get запросов"""
+
     class Meta:
         model = CourseSubscription
         fields = "__all__"
