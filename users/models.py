@@ -53,12 +53,16 @@ class Payment(models.Model):
     """Класс модели платежа"""
 
     METHOD_CHOICES = [
-        ("CASH", "Наличные"),
-        ("TRANSFER", "Перевод на счет"),
+        ("STRIPE", "Stripe"),
     ]
 
     user = models.ForeignKey(
-        to=CustomUser, on_delete=models.CASCADE, related_name="payments", verbose_name="пользователь"
+        to="users.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payments",
+        verbose_name="Пользователь",
     )
     payment_amount = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Сумма платежа")
     paid_course = models.ForeignKey(
@@ -77,8 +81,15 @@ class Payment(models.Model):
         related_name="lesson_payments",
         verbose_name="Оплаченный урок",
     )
-    payment_method = models.CharField(max_length=8, choices=METHOD_CHOICES, verbose_name="Способ оплаты")
+    payment_method = models.CharField(
+        max_length=8, choices=METHOD_CHOICES, verbose_name="Способ оплаты", default="STRIPE"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата платежа")
+
+    stripe_product_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="ID товара")
+    stripe_price_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="ID цены товара")
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="ID сессии")
+    stripe_payment_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на оплату")
 
     def clean(self):
         """Валидация: должен быть указан или курс, или урок"""
@@ -87,7 +98,7 @@ class Payment(models.Model):
 
     def __str__(self):
         """Строковое отображение платежа"""
-        return f"Платеж от {self.user} на сумму {self.payment_amount}"
+        return f"Payment {self.id} - {self.payment_amount} ({self.status})"
 
     class Meta:
         verbose_name = "платеж"

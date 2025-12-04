@@ -29,7 +29,7 @@ class IsOwner(BasePermission):
 
 
 class IsProfileOwner(BasePermission):
-    """Разрешает редактирование только владельцу профиля"""
+    """Проверяет, является ли пользователь владельцем профиля"""
 
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:

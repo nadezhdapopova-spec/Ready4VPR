@@ -14,7 +14,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ("id", "title", "preview", "description", "video_link", "category", "owner")
+        fields = ("id", "title", "preview", "description", "video_link", "category", "owner", "price")
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -38,4 +38,18 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ("id", "title", "preview", "description", "lessons_amount", "lessons", "is_subscribed")
+        fields = ("id", "title", "preview", "description", "lessons_amount", "lessons", "is_subscribed", "price")
+
+
+class CourseSubscriptionInputSerializer(serializers.Serializer):
+    """Сериализатор подписки для post запросов"""
+
+    course_id = serializers.IntegerField()
+
+
+class CourseSubscriptionSerializer(serializers.ModelSerializer):
+    """Сериализатор подписки для get запросов"""
+
+    class Meta:
+        model = CourseSubscription
+        fields = "__all__"

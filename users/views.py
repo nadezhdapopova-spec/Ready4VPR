@@ -1,12 +1,23 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from lms.models import Course, Lesson
 from users.models import CustomUser, Payment
-from users.permissions import IsProfileOwner
-from users.serializers import CustomUserSerializer, PaymentSerializer, PublicUserSerializer, RegisterSerializer
+from users.permissions import IsModerator, IsOwner, IsProfileOwner
+from users.serializers import (
+    CustomUserSerializer,
+    PaymentCreateSerializer,
+    PaymentSerializer,
+    PublicUserSerializer,
+    RegisterSerializer,
+)
+from users.services import create_checkout_session, create_stripe_price, create_stripe_product, get_session_status
 
 
 class RegisterAPIView(CreateAPIView):
@@ -27,7 +38,9 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all().prefetch_related("payments")
     filter_backends = [OrderingFilter]
     ordering_fields = ("id",)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_serializer_class(self):
         """
@@ -67,6 +80,20 @@ class PaymentListViewSet(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ("paid_course", "paid_lesson", "payment_method")
     ordering_fields = ("created_at",)
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        """
+        Все платежи может просматривать админ и модератор,
+        авторизованный пользователь видит свои платежи
+        """
+
+        user = self.request.user
+        if user.is_superuser or user.groups.filter(name="moderators").exists():
+            return Payment.objects.all()
+        return Payment.objects.filter(user=user)
 
 
 class PaymentRetrieveViewSet(generics.RetrieveAPIView):
@@ -74,3 +101,94 @@ class PaymentRetrieveViewSet(generics.RetrieveAPIView):
 
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_object(self):
+        """Просматривать платеж может только алмин, модератор или владелец"""
+
+        obj = super().get_object()
+        user = self.request.user
+        if user.is_superuser or user.groups.filter(name="moderators").exists():
+            return obj
+        if obj.user != user:
+            raise PermissionDenied("Вы не можете просматривать чужой платеж")
+        return obj
+
+
+class PaymentCreateViewSet(generics.CreateAPIView):
+    """Представление для создания платежа через API STRIPE"""
+
+    serializer_class = PaymentCreateSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def perform_create(self, serializer):
+        """Создает платеж, возвращает данные платежа с ссылкой для оплаты"""
+        user = self.request.user
+        course_id = serializer.validated_data.get("course_id")
+        lesson_id = serializer.validated_data.get("lesson_id")
+
+        if course_id:
+            course = get_object_or_404(Course, id=course_id)
+            amount = course.price
+            payment = Payment.objects.create(user=user, paid_course=course, payment_amount=amount)
+            product_name = f"Оплата курса: {course.title}"
+        else:
+            lesson = get_object_or_404(Lesson, id=lesson_id)
+            amount = lesson.price
+            payment = Payment.objects.create(user=user, paid_lesson=lesson, payment_amount=amount)
+            product_name = f"Оплата урока: {lesson.title}"
+
+        product_id = create_stripe_product(product_name)
+        payment.stripe_product_id = product_id
+
+        price_id = create_stripe_price(product_id, int(amount * 100))
+        payment.stripe_price_id = price_id
+
+        session_id, payment_url = create_checkout_session(price_id, payment.id)
+        payment.stripe_session_id = session_id
+        payment.stripe_payment_url = payment_url
+
+        payment.save()
+
+        self.response_data = {
+            "payment_id": payment.id,
+            "checkout_url": payment_url,
+            "payment_amount": payment.payment_amount,
+        }
+
+    def create(self, request, *args, **kwargs):
+        """
+        Переопределяет базовый метод create, чтобы вернуть кастомный ответ с нужными данными:
+        id платежа, ссылка для оплаты и сумма платежа
+        """
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(self.response_data, status=201)
+
+
+class PaymentStatusAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwner | IsModerator]
+
+    def get(self, request, payment_id):
+        payment = get_object_or_404(Payment, id=payment_id)
+
+        if not payment.stripe_session_id:
+            return Response({"error": "Для этого платежа нет сессии Stripe"}, status=400)
+
+        session = get_session_status(payment.stripe_session_id)
+
+        return Response(
+            {
+                "payment_id": payment.id,
+                "status": session["payment_status"],
+                "session_status": session["status"],
+                "amount_total": session["amount_total"] / 100,
+                "currency": session["currency"],
+            }
+        )

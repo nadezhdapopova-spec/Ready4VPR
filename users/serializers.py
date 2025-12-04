@@ -4,7 +4,7 @@ from users.models import CustomUser, Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели платежей"""
+    """Сериализатор для вывода совершенных платежей"""
 
     paid_course = serializers.StringRelatedField()
     paid_lesson = serializers.StringRelatedField()
@@ -12,6 +12,22 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ("id", "user", "payment_amount", "paid_course", "paid_lesson", "payment_method", "created_at")
+
+
+class PaymentCreateSerializer(serializers.Serializer):
+    """Сериализатор для создания платежа"""
+
+    course_id = serializers.IntegerField(required=False, allow_null=True)
+    lesson_id = serializers.IntegerField(required=False, allow_null=True)
+
+    def validate(self, attrs):
+        """
+        Проверяет, что заполнено только одно поле из двух - или курс, или урок
+        """
+
+        if bool(attrs.get("course_id")) == bool(attrs.get("lesson_id")):
+            raise serializers.ValidationError("Укажите только course_id или lesson_id (одно из двух)")
+        return attrs
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
@@ -42,6 +58,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "email", "password", "phone_number", "city", "avatar")
 
     def create(self, validated_data):
+        """Создает объект пользователя"""
+
         return CustomUser.objects.create_user(
             username=validated_data["username"],
             email=validated_data.get("email"),
