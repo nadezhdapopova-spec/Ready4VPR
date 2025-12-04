@@ -76,7 +76,7 @@ class PaymentListViewSet(generics.ListAPIView):
     """Представление для просмотра платежей"""
 
     serializer_class = PaymentSerializer
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.select_related("user", "paid_course", "paid_lesson")
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ("paid_course", "paid_lesson", "payment_method")
     ordering_fields = ("created_at",)
@@ -100,7 +100,7 @@ class PaymentRetrieveViewSet(generics.RetrieveAPIView):
     """Представление для просмотра деталей платежа"""
 
     serializer_class = PaymentSerializer
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.select_related("user", "paid_course", "paid_lesson")
     permission_classes = [
         IsAuthenticated,
     ]
