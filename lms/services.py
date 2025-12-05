@@ -24,16 +24,3 @@ def get_course_update_mail_info(course_id):
         f"Возвращайтесь на наш сайт, чтобы первым увидеть обновления!"
     )
     return subject, message
-
-
-schedule, created = IntervalSchedule.objects.get_or_create(
-     every=24,
-     period=IntervalSchedule.HOURS,
- )
-
-PeriodicTask.objects.get_or_create(
-     interval=schedule,
-     name="Block nonactive users",
-     task="lms.tasks.block_nonactive_user",
-     args=json.dumps([]),
- )

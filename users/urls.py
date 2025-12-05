@@ -29,7 +29,7 @@ urlpatterns = [
         "token/",
         TokenObtainPairView.as_view(
             permission_classes=[
-                AllowAny,
+                AllowAny
             ]
         ),
         name="token_obtain_pair",

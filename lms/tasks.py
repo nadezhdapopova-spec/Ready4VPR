@@ -17,7 +17,8 @@ def block_nonactive_user():
         if time_delta.days > 30:
             user.is_active = False
             user.save()
-
+            print("done")
+        print("no nonactive_user")
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def send_course_update_email(self, course_id):

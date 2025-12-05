@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "cities_light",
     "users",
-    "lms",
+    "lms.apps.LmsConfig",
 ]
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
