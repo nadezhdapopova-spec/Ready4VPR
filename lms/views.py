@@ -1,7 +1,9 @@
-from django.utils import timezone
 from datetime import timedelta
+
+from django.utils import timezone
+
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, status, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -16,8 +18,8 @@ from lms.serializers import (
     CourseSubscriptionSerializer,
     LessonSerializer,
 )
-from users.permissions import IsModerator, IsOwner, NotModerator
 from lms.tasks import send_course_update_email
+from users.permissions import IsModerator, IsOwner, NotModerator
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -58,6 +60,11 @@ class CourseViewSet(viewsets.ModelViewSet):
         return [perm() for perm in self.permission_classes]
 
     def update(self, request, *args, **kwargs):
+        """
+        Обновляет курс. Если с последнего обновления прошло 4 и более часа,
+        подписчикам этого курса отправляется письмо об обновлении
+        """
+
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
         previous_updated_at = instance.updated_at
