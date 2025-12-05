@@ -10,7 +10,7 @@ from users.models import CustomUser
 
 
 @shared_task
-def user_active_period():
+def block_nonactive_user():
     users = CustomUser.objects.filter(is_stuff=False).all()
     for user in users:
         time_delta = datetime.now() - user.last_login
