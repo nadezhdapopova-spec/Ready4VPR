@@ -1,7 +1,4 @@
 from lms.models import Course, CourseSubscription
-import json
-
-from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 
 def get_subscribers_emails(course_id):

@@ -27,11 +27,7 @@ urlpatterns = [
     path("payment/status/<int:payment_id>/", PaymentStatusAPIView.as_view(), name="payment_status"),
     path(
         "token/",
-        TokenObtainPairView.as_view(
-            permission_classes=[
-                AllowAny
-            ]
-        ),
+        TokenObtainPairView.as_view(permission_classes=[AllowAny]),
         name="token_obtain_pair",
     ),
     path(

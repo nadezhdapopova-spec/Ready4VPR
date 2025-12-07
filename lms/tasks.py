@@ -11,14 +11,18 @@ from users.models import CustomUser
 
 @shared_task
 def block_nonactive_user():
-    users = CustomUser.objects.filter(is_stuff=False).all()
+    """Блокирует пользователя с помощью флага is_active, если пользователь не заходил более месяца"""
+
+    users = CustomUser.objects.filter(is_staff=False).all()
     for user in users:
+        if not user.last_login:
+            continue
         time_delta = datetime.now() - user.last_login
         if time_delta.days > 30:
             user.is_active = False
             user.save()
-            print("done")
-        print("no nonactive_user")
+            print(print(f"{user.email}: nonactive"))
+
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def send_course_update_email(self, course_id):
