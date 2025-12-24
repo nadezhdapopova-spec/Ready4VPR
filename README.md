@@ -16,6 +16,7 @@ cd Ready4VPR
 SECRET_KEY=your_secret_key_here
 DEBUG=True
 
+ALLOWED_HOSTS=localhost,127.0.0.1
 DB_NAME=your_database_name_here
 DB_USER=your_database_user_here
 DB_PASSWORD=your_database_password_here
