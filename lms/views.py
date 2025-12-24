@@ -1,5 +1,9 @@
+from datetime import timedelta
+
+from django.utils import timezone
+
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +18,7 @@ from lms.serializers import (
     CourseSubscriptionSerializer,
     LessonSerializer,
 )
+from lms.tasks import send_course_update_email
 from users.permissions import IsModerator, IsOwner, NotModerator
 
 
@@ -53,6 +58,25 @@ class CourseViewSet(viewsets.ModelViewSet):
         elif self.action == "destroy":
             self.permission_classes = [IsAuthenticated, IsOwner]
         return [perm() for perm in self.permission_classes]
+
+    def update(self, request, *args, **kwargs):
+        """
+        Обновляет курс. Если с последнего обновления прошло 4 и более часа,
+        подписчикам этого курса отправляется письмо об обновлении
+        """
+
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        previous_updated_at = instance.updated_at
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if timezone.now() - previous_updated_at >= timedelta(hours=4):
+            send_course_update_email.delay(course_id=instance.id)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class BaseLessonAPIView(generics.GenericAPIView):
