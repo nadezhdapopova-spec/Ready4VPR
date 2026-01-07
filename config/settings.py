@@ -16,6 +16,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
 
 INSTALLED_APPS = [
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -26,7 +27,6 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_yasg",
     "django_celery_beat",
-    "corsheaders",
     "rest_framework_simplejwt",
     "phonenumber_field",
     "cities_light",
@@ -39,9 +39,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
