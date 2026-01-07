@@ -26,6 +26,9 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
 
+    env:
+      SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+
     steps:
     - name: Check out code
       uses: actions/checkout@v3
