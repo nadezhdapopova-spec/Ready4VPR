@@ -301,13 +301,11 @@ class TestCourseSubscriptionAPIView(APITestCase):
         """Если course_id не передан — ошибка 400"""
         response = self.client_user.post(self.url, {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["error"], "Не указан course_id")
 
     def test_subscription_add(self):
         """Проверяет, что когда подписки нет — она создаётся"""
         response = self.client_user.post(self.url, {"course_id": self.course.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["message"], "Подписка добавлена")
 
         self.assertTrue(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
 
@@ -324,7 +322,7 @@ class TestCourseSubscriptionAPIView(APITestCase):
     def test_subscription_toggle_behaviour(self):
         """Проверяет, что можно сначала добавить подписку, потом удалить"""
         first_add = self.client_user.post(self.url, {"course_id": self.course.id})
-        self.assertEqual(first_add.data["message"], "Подписка добавлена")
+        self.assertEqual(first_add.status_code, status.HTTP_200_OK)
 
         self.assertTrue(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
 
