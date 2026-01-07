@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -34,8 +35,6 @@ INSTALLED_APPS = [
     "lms",
 ]
 
-# CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
-# CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -83,6 +82,13 @@ DATABASES = {
     }
 }
 
+if "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sglite3",
+            "NAME": BASE_DIR / "test_bd.sqlite3",
+        }
+    }
 
 # Password validation
 
