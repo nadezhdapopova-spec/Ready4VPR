@@ -76,6 +76,7 @@ jobs:
 
       - name: Deploy to server
         run: |
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
           cat > .env << EOF
           DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG=False
@@ -99,4 +100,3 @@ jobs:
           EOF
           rsync -avz docker-compose.yaml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/         
           rm -f .env
-          
