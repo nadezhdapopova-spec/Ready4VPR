@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env", override=True)
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
@@ -165,7 +165,7 @@ if CACHE_ENABLED:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": os.getenv("LOCATION"),
+            "LOCATION": os.getenv("REDIS_LOCATION"),
         }
     }
 

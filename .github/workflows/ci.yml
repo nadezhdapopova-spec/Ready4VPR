@@ -80,6 +80,7 @@ jobs:
       - name: Deploy to server
         run: |
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          sed -i "s/server_name localhost;/server_name ${{ secrets.MY_SERVER_NAME }};/" nginx.conf
           cat > .env << EOF
           DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG=False
@@ -98,8 +99,8 @@ jobs:
           EMAIL_USE_TLS=False
           EMAIL_USE_SSL=True
           STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}
-          ALLOWED_HOSTS=localhost,127.0.0.1
           DOCKER_HUB_TAG=${{ github.sha }}
+          BASE_SERVER_URL=${{ secrets.BASE_SERVER_URL }}
           EOF
-          rsync -avz docker-compose.yaml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/         
+          rsync -avz docker-compose.yaml .env nginx.conf ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/         
           rm -f .env
