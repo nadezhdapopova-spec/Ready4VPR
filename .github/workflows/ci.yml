@@ -76,9 +76,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
-          mkdir -p /home/${{ secrets.SSH_USER }}/ready4vpr
-          cat > /home/${{ secrets.SSH_USER }}/ready4vpr/.env << EOL
+          cat > .env << EOF
           DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG=False
           DB_NAME=ready_four_vpr
@@ -98,6 +96,7 @@ jobs:
           STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}
           ALLOWED_HOSTS=localhost,127.0.0.1
           DOCKER_HUB_TAG=${{ github.sha }}
-          EOL
-          EOF          
-          scp docker-compose.yaml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/docker-compose.yaml 
+          EOF
+          rsync -avz docker-compose.yaml .env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/         
+          rm -f .env
+          
