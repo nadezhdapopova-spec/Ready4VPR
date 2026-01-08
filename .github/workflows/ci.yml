@@ -105,7 +105,7 @@ jobs:
           EOF
           rsync -avz docker-compose.yaml .env nginx.conf ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/         
           rm -f .env
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /home/${{ secrets.SSH_USER }}/ready4vpr
           docker compose pull
           docker compose up -d
