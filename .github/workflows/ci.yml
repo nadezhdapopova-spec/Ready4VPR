@@ -78,25 +78,26 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
           mkdir -p /home/${{ secrets.SSH_USER }}/ready4vpr
-          touch /home/${{ secrets.SSH_USER }}/ready4vpr/.env  
-          echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" > /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DEBUG=False" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DB_NAME=ready_four_vpr" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DB_USER=postgres" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DB_HOST=db" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DB_PORT=5432" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "REDIS_LOCATION=redis://redis:6379/1" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "CELERY_BROKER_URL=redis://redis:6379/2" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "CELERY_RESULT_BACKEND=redis://redis:6379/3" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "EMAIL_HOST=smtp.yandex.ru" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "EMAIL_PORT=465" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "EMAIL_USE_TLS=False" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "EMAIL_USE_SSL=True" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "ALLOWED_HOSTS=localhost,127.0.0.1" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
-          echo "DOCKER_HUB_TAG=${{ github.sha }}" >> /home/${{ secrets.SSH_USER }}/ready4vpr/.env
+          cat > /home/${{ secrets.SSH_USER }}/ready4vpr/.env << EOL
+          DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+          DEBUG=False
+          DB_NAME=ready_four_vpr
+          DB_USER=postgres
+          DB_HOST=db
+          DB_PORT=5432
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          REDIS_LOCATION=redis://redis:6379/1
+          CELERY_BROKER_URL=redis://redis:6379/2
+          CELERY_RESULT_BACKEND=redis://redis:6379/3
+          EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
+          EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
+          EMAIL_HOST=smtp.yandex.ru
+          EMAIL_PORT=465
+          EMAIL_USE_TLS=False
+          EMAIL_USE_SSL=True
+          STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}
+          ALLOWED_HOSTS=localhost,127.0.0.1
+          DOCKER_HUB_TAG=${{ github.sha }}
+          EOL
           EOF          
           scp docker-compose.yaml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/ready4vpr/docker-compose.yaml 
