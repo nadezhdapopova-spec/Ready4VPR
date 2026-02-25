@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "ready4vpr"
 version = "0.1.0"
-description = "an educational project, a Django web application, representing a Learning Management System for preparing elementary school students for the All-Russian Testing of Knowledge (VPR)"
+description = "Django web application, representing a Learning Management System for preparing elementary school students for the All-Russian Testing of Knowledge (VPR)"
 authors = ["Nadezhda_Popova <nadezhdapopova13@yandex.ru>"]
 readme = "README.md"
 

@@ -1,17 +1,22 @@
 ## Ready4VPR
 
-Django-проект для отслеживания курсов и обучения.
-Использует PostgreSQL, Redis, Celery, Celery beat, развёртывается на удалённом сервере с помощью Docker Compose и GitHub Actions.
+Backend-платформа для онлайн-обучения.
+Реализует управление курсами и уроками, подписки, систему платежей через Stripe, разграничение ролей, фоновые задачи 
+и автоматизированный деплой.
+
+Проект построен на Django + DRF и разворачивается в Docker-инфраструктуре с CI/CD через GitHub Actions.
 
 ### Архитектура
 
-Django + DRF
+Django + Django REST Framework
 
 PostgreSQL
 
 Redis
 
 Celery + Celery Beat
+
+Stripe API
 
 Gunicorn
 
@@ -21,34 +26,201 @@ Docker / Docker Compose
 
 GitHub Actions (CI/CD)
 
-### Настройка удалённого сервера
+### Пользователи и роли
 
-**На сервере должны быть установлены:**
-````
-sudo apt update
-sudo apt install -y docker.io docker-compose-plugin nginx
-````
+**Пользователь**
 
-**Дополнительно:**
+- Регистрация через API
 
-- пользователь добавлен в группу docker
+- Управление своим профилем
 
-- вход по SSH-ключу
+- Просмотр курсов и уроков
 
-- открыты порты 80, 443, 22
+- Подписка на обновления курса
 
-- проект размещается в директории:
-/home/<user>/ready4vpr
+- Оплата курсов и уроков
+
+- Просмотр своих платежей
+
+**Модератор**
+
+- Просмотр и редактирование курсов
+
+- Контроль контента
+
+- Доступ к платежам пользователей
+
+**Суперпользователь**
+
+- Полный доступ ко всем данным
+
+**Реализованы кастомные permissions**
+
+- IsOwner
+
+- IsModerator
+
+- IsProfileOwner
+
+- Комбинированные права через DRF
+
+### Курсы и уроки
+
+**Курсы**
+
+- CRUD через ViewSet
+
+- Автоматическое назначение владельца
+
+- Подписки пользователей
+
+- Подсчёт количества уроков
+
+- Отправка email при обновлении курса (если обновление произошло спустя 4+ часа)
+
+**Уроки**
+
+- CRUD через APIView
+
+- Привязка к курсу
+
+- Ограничение на сторонние видео-ссылки (разрешён только YouTube)
+
+- Пагинация
+
+- Валидатор видео: разрешены только домены:
+
+    - youtube.com
+    
+    - youtu.be
+
+### Платежи (Stripe)
+
+**Реализована интеграция с Stripe:**
+
+1. Создание платежа
+
+- Создаётся продукт в Stripe
+
+- Создаётся цена
+
+- Создаётся Checkout Session
+
+- Возвращается:
+
+    - payment_id
+    
+    - checkout_url
+    
+    - payment_amount
+
+2. Проверка статуса платежа
+
+- Отдельный endpoint возвращает:
+
+    - статус оплаты
+    
+    - статус сессии
+    
+    - итоговую сумму
+    
+    - валюту
+
+Платеж может относиться либо к курсу, либо к уроку (валидация на уровне модели и сериализатора).
+
+### Подписки и уведомления
+
+**Подписка на курс**
+
+- Endpoint добавляет или удаляет подписку
+
+- Уникальность (user, course)
+
+**Email-уведомления**
+
+- При обновлении курса подписчикам отправляется письмо.
+
+**Celery-задачи:**
+
+- send_course_update_email (сообщение пользователю об обновлении куса, на который он подписан)
+
+- block_nonactive_user (блокировка пользователей без активности > 30 дней)
+
+### Пользователи
+
+- Кастомная модель пользователя (email как USERNAME_FIELD)
+
+- Аватар
+
+- Город
+
+- Номер телефона
+
+- Prefetch платежей в профиле
+
+- Админ-панель кастомизирована:
+
+    - Превью аватара
+    
+    - Расширенные поля
+
+### API Эндпоинты (основные)
+```
+Пользователи
+
+POST /users/register/
+
+GET /users/
+
+GET /users/{id}/
+
+PATCH /users/{id}/
+
+Курсы
+
+GET /courses/
+
+POST /courses/
+
+GET /courses/{id}/
+
+PATCH /courses/{id}/
+
+DELETE /courses/{id}/
+
+Уроки
+
+GET /lessons/
+
+POST /lessons/
+
+GET /lessons/{id}/
+
+PATCH /lessons/{id}/
+
+DELETE /lessons/{id}/
+
+Подписки
+
+POST /courses/subscribe/
+
+Платежи
+
+POST /payments/create/
+
+GET /payments/
+
+GET /payments/{id}/
+
+GET /payments/status/{payment_id}/
+```
 
 ### Переменные окружения
 
-**Файл .env:**
+- .env не коммитится в репозиторий.
 
-- не коммитится в репозиторий
+- Основные переменные:
 
-- используется на сервере и создаётся автоматически в GitHub Actions
-
-**Шаблон (.env.sample):**
 ````
 DJANGO_SECRET_KEY=your_secret_key_here
 DEBUG=False
@@ -78,6 +250,25 @@ DOCKER_HUB_TAG=docker_hub_ready_four_vpr_image_tag_here
 BASE_SERVER_URL=localhost
 ````
 
+### Настройка удалённого сервера
+
+**На сервере должны быть установлены:**
+````
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin nginx
+````
+
+**Дополнительно:**
+
+- пользователь добавлен в группу docker
+
+- вход по SSH-ключу
+
+- открыты порты 80, 443, 22
+
+- проект размещается в директории:
+/home/<user>/ready4vpr
+
 ### GitHub Secrets
 
 В репозитории → Settings → Secrets and variables → Actions должны быть добавлены:
@@ -96,51 +287,98 @@ BASE_SERVER_URL=localhost
 | `SSH_USER`                | Пользователь сервера    |
 | `SERVER_IP`               | IP сервера              |
 
+### Docker-инфраструктура
+
+- Проект запускается через Docker Compose:
+
+web (Django + Gunicorn)
+
+db (PostgreSQL)
+
+redis
+
+celery
+
+celery-beat
+
+nginx
+
+
 ### CI/CD (GitHub Actions)
 
-Workflow расположен в .github/workflows/ci.yaml
+Workflow включает:
 
-**Алгоритм workflow:**
 - Lint
 
-    - запуск flake8
-
+    - flake8
 
 - Tests
 
-    - запуск Django-тестов
-
-    - при ошибках деплой останавливается
-
+    - Django tests
 
 - Build
 
-    - сборка Docker-образа
+    - сборка Docker image
 
     - push в Docker Hub
-
 
 - Deploy
 
     - генерация .env
-
-    - подмена server_name в nginx.conf
-
-    - деплой на сервер через rsync
-
-    - загрузка образов сервисов, указанных в docker-compose.yaml (docker compose pull)
-
-    - запуск сервисов в фоновом режиме (docker compose up -d)
+    
+    - деплой на сервер через SSH
+    
+    - docker compose pull
+    
+    - docker compose up -d
 
 Workflow запускается автоматически при каждом push.
 
-### Деплой приложения
+### Развёртывание
 
-Деплой происходит автоматически после успешного прохождения тестов.
+**Локально**
+```
+git clone https://github.com/nadezhdapopova-spec/Ready4VPR
+cd ready4vpr
+docker compose up --build
+```
 
-Ручной деплой на сервере:
-````
+На сервере:
+```
 cd ~/ready4vpr
 docker compose pull
 docker compose up -d
-````
+```
+
+### Production-особенности
+
+- Custom User model
+
+- Stripe integration
+
+- Role-based permissions
+
+- Object-level access control
+
+- Celery background tasks
+
+- Redis caching
+
+- Dockerized infrastructure
+
+- CI/CD pipeline
+
+- Email notifications
+
+- Prefetch/select_related оптимизация
+
+- Pagination
+
+- DRF filtering & ordering
+
+
+### Автор
+
+Надежда Попова
+
+Python Backend Developer
